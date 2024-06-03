@@ -1,20 +1,20 @@
-name: 'Jenkins Job Trigger'
-description: 'Trigger a Jenkins job'
+name: "Jenkins Job Trigger"
+description: "Trigger a Jenkins job"
 branding:
-  icon: 'terminal'
-  color: 'green'
+  icon: "terminal"
+  color: "green"
 inputs:
   url:
-    description: 'Jenkins full URL including http/https protocol'
+    description: "Jenkins full URL including http/https protocol"
     required: true
-  user_name: 
-    description: 'User name of Jenkins'
+  user_name:
+    description: "User name of Jenkins"
     required: true
   api_token:
-    description: 'Jenkins API token'
+    description: "Jenkins API token"
     required: true
   job_name:
-    description: 'Job name'
+    description: "Job name"
     required: true
   parameter:
     description: 'Job parameter in JSON format. ex) {"param1":"value1"} '
@@ -23,14 +23,20 @@ inputs:
     description: 'Additional headers to include in the HTTP requests in JSON format. ex) {"param1":"value1"} '
     required: false
   wait:
-    description: 'Waiting for job completion or not'
+    description: "Waiting for job completion or not"
     required: false
     default: "true"
   timeout:
-    description: 'Timeout (seconds) for github action. Set 600s as default'
+    description: "Timeout (seconds) for github action. Set 600s as default"
     required: false
     default: "600"
-  
+
+outputs:
+  jobUrl: # id of output
+    description: "The running job link url trigger by this action"
+  runId:
+    description: "The running job number id trigger by this action"
+
 runs:
-  using: 'node12'
-  main: 'index.js'
+  using: "node20"
+  main: "index.js"
