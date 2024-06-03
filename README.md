@@ -26,7 +26,8 @@ Please see [How to get the API Token for Jenkins](https://stackoverflow.com/ques
 ### Example
 ```yaml
 - name: Trigger jenkins job
-  uses: jabbukka/jenkins-trigger@main
+  uses: feiguoL/jenkins-trigger@main
+  id: generate_url
   with:
     url: ${{ secrets.JENKINS_URL }}
     job_name: "build_web_application"
@@ -34,4 +35,7 @@ Please see [How to get the API Token for Jenkins](https://stackoverflow.com/ques
     api_token: ${{ secrets.JENKINS_TOKEN }}
     wait: "true"
     timeout: "1000"
+- name: print_url
+  run: |
+    echo "pipeline run link url: ${{ steps.generate_url.outputs.jobUrl }}, runId: ${{ steps.generate_url.outputs.runId }}"
 ```

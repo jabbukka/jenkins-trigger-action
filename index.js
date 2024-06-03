@@ -39,7 +39,7 @@ async function requestJenkinsJob(jobName, params, headers) {
   };
   await new Promise((resolve, reject) => request(req)
     .on('response', (res) => {
-      core.info(`>>> Job is started!`);
+      core.info(`[INFO] Job is started!`);
       resolve();
     })
     .on("error", (err) => {
@@ -73,21 +73,26 @@ async function getJobStatus(jobName, headers) {
       })
     );
 }
+// https://kb.novaordis.com/index.php/Jenkins_currentBuild
 async function waitJenkinsJob(jobName, timestamp, headers) {
-  core.info(`>>> Waiting for "${jobName}" ...`);
+  core.info(`[INFO] Waiting for "${jobName}" ...`);
   while (true) {
     let data = await getJobStatus(jobName, headers);
     if (data.timestamp < timestamp) {
-      core.info(`>>> Job is not started yet... Wait 5 seconds more...`)
+      core.info(`[INFO] Job is not started yet...`)
     } else if (data.result == "SUCCESS") {
-      core.info(`>>> Job "${data.fullDisplayName}" successfully completed!`);
+      core.info(`[INFO] Job "${data.fullDisplayName}" successfully completed!`);
+      core.setOutput("jobUrl", `${data.url}`);
+      core.setOutput("runId", `${data.number}`);
       break;
     } else if (data.result == "FAILURE" || data.result == "ABORTED") {
-      throw new Error(`Failed job ${data.fullDisplayName}`);
+      core.setOutput("jobUrl", `${data.url}`);
+      core.setOutput("runId", `${data.number}`);
+      throw new Error(`[ERR] Job failed ${data.fullDisplayName}`);
     } else {
-      core.info(`>>> Current Duration: ${data.duration}. Expected: ${data.estimatedDuration}`);
+      core.info(`>>> [INFO] Job url link: ${data.url}. current duration: ${data.duration}. expected: ${data.estimatedDuration}, wait for job done...`);
     }
-    await sleep(5); // API call interval
+    await sleep(10); // API call interval
   }
 }
 
@@ -99,7 +104,7 @@ async function main() {
     let jobName = core.getInput('job_name');
     if (core.getInput('parameter')) {
       params = JSON.parse(core.getInput('parameter'));
-      core.info(`>>> Parameter ${params.toString()}`);
+      core.info(`[INFO] Parameter ${JSON.stringify(params)}`);
     }
     // create auth token for Jenkins API
     const API_TOKEN = Buffer.from(`${core.getInput('user_name')}:${core.getInput('api_token')}`).toString('base64');
@@ -129,5 +134,4 @@ async function main() {
   }
 }
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED="0";
 main();
